@@ -251,7 +251,21 @@ public class InscripcionDAO {
      *    retorna Optional.empty() en ese caso.
      */
     public Optional<String> cursoConMasInscritos() throws SQLException {
-        // TODO: completar (ver pistas arriba).
+    	String sql = "SELECT c.nombre, COUNT(*) AS total "
+                + "FROM inscripciones i "
+                + "JOIN cursos c ON i.curso_id = c.id "
+                + "GROUP BY c.nombre "
+                + "ORDER BY total DESC "
+                + "LIMIT 1";
+
+     try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
+          PreparedStatement statement = conexion.prepareStatement(sql);
+          ResultSet rs = statement.executeQuery()) {
+
+         if (rs.next()) {
+             return Optional.of(rs.getString("nombre"));
+         }
+     } 
         return Optional.empty();
     }
 }
