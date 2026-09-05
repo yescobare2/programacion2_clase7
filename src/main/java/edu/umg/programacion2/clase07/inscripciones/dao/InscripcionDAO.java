@@ -157,8 +157,28 @@ public class InscripcionDAO {
      * seleccionando columnas de `estudiantes` y filtrando por `c.nombre`.
      */
     public List<Estudiante> listarEstudiantesDeCurso(String nombreCurso) throws SQLException {
+    	String sql = "SELECT e.id, e.nombre, e.carnet "
+    			   + "FROM inscripciones i "
+    			   + "JOIN estudiantes e ON i.estudiante_id = e.id "
+    			   + "JOIN cursos c ON i.curso_id = c.id "
+    			   + "WHERE c.nombre = ?";
+    	
         List<Estudiante> resultado = new ArrayList<>();
-        // TODO: completar.
+        
+        try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
+                PreparedStatement statement = conexion.prepareStatement(sql)) {
+
+               statement.setString(1, nombreCurso);
+
+               try (ResultSet rs = statement.executeQuery()) {
+                   while (rs.next()) {
+                       int id = rs.getInt("id");
+                       String nombre = rs.getString("nombre");
+                       String carnet = rs.getString("carnet");
+                       resultado.add(new Estudiante(id, nombre, carnet));
+                   }
+               }
+           }
 
         return resultado;
     }
